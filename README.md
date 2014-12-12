@@ -1,0 +1,4 @@
+ConnectFour
+===========
+
+Connect Four simulator
