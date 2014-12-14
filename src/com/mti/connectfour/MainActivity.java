@@ -3,7 +3,12 @@ package com.mti.connectfour;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.google.gson.Gson;
+
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.widget.Toast;
 
@@ -11,6 +16,8 @@ import android.widget.Toast;
 public class MainActivity extends ActionBarActivity {
 
 	boolean winnerYesNo=false;
+	
+	private SharedPreferences sharedPreferences;
 	
 	//int[][] boardArray;
 	
@@ -87,12 +94,36 @@ public class MainActivity extends ActionBarActivity {
     	}
 		*/
     	
+
+    	// stop displaying this for now
+    	/*
     	for(int matchIndex=matches.size()-1; matchIndex>=0; matchIndex--) {
     		Match thisMatch = matches.get(matchIndex);
     		displayBoard(thisMatch.getBoard());
             //Toast.makeText(this.getBaseContext(), matches.get(matchIndex).getName(), Toast.LENGTH_LONG).show();
     	}
+		*/
+    	//  for now just display the last board
+		Match thisMatch = matches.get(matches.size()-1);    	
+		displayBoard(thisMatch.getBoard());
     	
+		
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		Editor editor = sharedPreferences.edit();
+
+		
+		//  This seemed to now work
+		Gson gson = new Gson();
+		
+		
+		// I will now test these
+		String json = gson.toJson(matches);
+
+		editor.putString("board", json);
+		editor.commit();
+    	
+		//  Here let's bring up new view
+		setContentView(new BoardView(this));
     	
     }
 
