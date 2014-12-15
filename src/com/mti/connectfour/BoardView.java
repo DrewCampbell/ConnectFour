@@ -10,16 +10,26 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.preference.PreferenceManager;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 
-public class BoardView  extends SurfaceView  {
+public class BoardView  extends SurfaceView implements OnTouchListener {
 
 	Paint paint;
 	Paint paintShadow;
+	
+	float xValue;
+	float yValue;	
+
+	ArrayList<Match> matches;
+	int currentMatchIndex;
 	
 	private SharedPreferences sharedPreferences;
 	
@@ -28,6 +38,16 @@ public class BoardView  extends SurfaceView  {
 		
 		paint = new Paint();
 		paintShadow = new Paint();
+		
+
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		
+		Gson gson = new Gson();
+		String json = sharedPreferences.getString("board", null);
+		Type type = new TypeToken<ArrayList<Match>>() {}.getType();
+		matches = gson.fromJson(json, type);		
+
+		currentMatchIndex = matches.size()-1;
 		
 		setWillNotDraw(false);
 	}
@@ -48,19 +68,20 @@ public class BoardView  extends SurfaceView  {
 		canvas.drawColor(Color.GRAY);
 		
 		
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		
-		Gson gson = new Gson();
-		String json = sharedPreferences.getString("board", null);
-		Type type = new TypeToken<ArrayList<Match>>() {}.getType();
-		ArrayList<Match> matches = gson.fromJson(json, type);
 		
 		paint.setTextSize(50);
 		paint.setColor(Color.RED);
 		
 
+		paint.setColor(Color.BLACK);
+		canvas.drawRect(800, 1200, 900, 1300 ,paint);
+		
+		paint.setColor(Color.BLACK);
+		canvas.drawRect(1000, 1200, 1100, 1300 ,paint);
+	
 
-
+		
+		
 		xPartition = getWidth()/(numColumns+1); 
 		yPartition = getHeight()/2/(numRows);
 		yBase = getHeight() * 3/5;		
@@ -76,11 +97,8 @@ public class BoardView  extends SurfaceView  {
 
 			for(int column=0; column < numColumns; column++) {
 
-				//canvas.drawText("" + matches.get(matches.size()-1).getValueAtPosition(0, column), (column+1) * xPartition, yBase, paint);
-
-				//canvas.drawText("" + matches.get(matches.size()-1).getValueAtPosition(row, column), (column+1) * xPartition, yBase - (row) * yPartition, paint);
-
-				if(matches.get(matches.size()-1).getValueAtPosition(row, column)==1) {
+		
+				if(matches.get(currentMatchIndex).getValueAtPosition(row, column)==1) {
 					paint.setColor(Color.RED);
 					canvas.drawCircle((column+1) * xPartition, yBase - (row) * yPartition, 50, paint);					
 	
@@ -99,7 +117,7 @@ public class BoardView  extends SurfaceView  {
 					canvas.drawLine((column+1) * xPartition - 35, yBase - (row) * yPartition + 35, (column+1) * xPartition + 35, yBase - (row) * yPartition - 35, paintShadow);
 					canvas.drawRect(innerRect, paint);
 				}
-				if(matches.get(matches.size()-1).getValueAtPosition(row, column)==2) {
+				if(matches.get(currentMatchIndex).getValueAtPosition(row, column)==2) {
 					paint.setColor(Color.BLACK);
 					canvas.drawCircle((column+1) * xPartition, yBase - (row) * yPartition, 50, paint);					
 
@@ -117,7 +135,7 @@ public class BoardView  extends SurfaceView  {
 				
 				
 				}
-				if(matches.get(matches.size()-1).getValueAtPosition(row, column)==0) {
+				if(matches.get(currentMatchIndex).getValueAtPosition(row, column)==0) {
 					paint.setColor(Color.WHITE);
 					canvas.drawCircle((column+1) * xPartition, yBase - (row) * yPartition, 50, paint);					
 				}
@@ -146,6 +164,63 @@ public class BoardView  extends SurfaceView  {
 		//ctx.arc(xpos,ypos,20,0,Math.PI*2,true);
 		//canvas.drawText("" + matches.get(matches.size()-1).getValueAtPosition(0, 0), 200, 200, paint);
 
+		paint.setColor(Color.BLACK);
+		canvas.drawText("X and Y Values " + xValue + " " + yValue, 200, 1200, paint);
+
+	}
+
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+
+ 
+
+        switch(event.getAction()){
+			case MotionEvent.ACTION_DOWN:
+				xValue = event.getX();
+				yValue = event.getY();
+
+				v.setWillNotDraw(false);
+
+		        Toast.makeText(this.getContext(), "onTouch", Toast.LENGTH_LONG).show(); 
+				break;
+			case MotionEvent.ACTION_UP:
+				break;
+			}
+		return false;
+		
+	}
+	
+	public boolean onTouchEvent(MotionEvent event) {
+		
+
+        switch(event.getAction()){
+			case MotionEvent.ACTION_DOWN:
+				xValue = event.getX();
+				yValue = event.getY();
+
+				//  for some reason it works if you first set it to true and then back to false
+
+				if(event.getX()>800 && event.getX()<900 && event.getY()>1200 && event.getY()<1300 && currentMatchIndex!=0) {
+					currentMatchIndex--;
+					setWillNotDraw(true);				
+					setWillNotDraw(false);				
+				}
+				
+				if(event.getX()>1000 && event.getX()<1100 && event.getY()>1200 && event.getY()<1300 & currentMatchIndex!=matches.size()-1) {
+					currentMatchIndex++;
+					setWillNotDraw(true);				
+					setWillNotDraw(false);				
+				}
+				
+				
+		        Toast.makeText(this.getContext(), "onTouchEvent", Toast.LENGTH_LONG).show(); 
+				break;
+			case MotionEvent.ACTION_UP:
+				break;
+			}
+		return false;		
+		
 		
 	}
 	
