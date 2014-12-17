@@ -41,6 +41,7 @@ public class MainActivity extends ActionBarActivity {
         			  		  {0,0,0,0,0,0,0},
         			  		  {0,0,0,0,0,0,0}};
         
+        String playerMove = "r";
         
         // gotta make a listview of matches instead of just one match object
         //Match board1 = new Match(boardArray);
@@ -52,7 +53,9 @@ public class MainActivity extends ActionBarActivity {
         //matches.add(new Match());
         //matches.get(matches.size()-1).changeBoard(boardArray);
         matches.get(matches.size()-1).setName("match" + nameIndex);        
-
+        matches.get(matches.size()-1).setPlayerMove(playerMove);
+        
+        
         int randomNum;
     	Random rand = new Random();        
     	int chipValue = 1;
@@ -62,7 +65,6 @@ public class MainActivity extends ActionBarActivity {
 
         	//randomNum = rand.nextInt(7);    		
 
-        	nameIndex++;
         	chipAddedSuccessfully = false;
         	while(chipAddedSuccessfully==false) {	
 
@@ -70,9 +72,17 @@ public class MainActivity extends ActionBarActivity {
             	chipAddedSuccessfully = addChipAtLocation(boardArray, randomNum, chipValue);
         	}   	        	
 
-    		matches.add(new Match(boardArray));
+        	nameIndex++;
+        	if(playerMove=="r") {
+        		playerMove="b";
+        	} else {
+        		playerMove="r";
+        	}
+        		
+        	matches.add(new Match(boardArray));
     		matches.get(matches.size()-1).setName("match" + nameIndex);
-        	
+    		matches.get(matches.size()-1).setPlayerMove(playerMove);    		
+    		
         	if(chipValue==1) {
         		chipValue=2;
         	} else {

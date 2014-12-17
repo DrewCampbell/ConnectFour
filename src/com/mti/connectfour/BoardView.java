@@ -39,18 +39,20 @@ public class BoardView  extends SurfaceView implements OnTouchListener {
 	//  Defines placement of left and right buttons
 	int lButtonLeft=800;
 	int lButtonRight=950;
-	int lButtonTop=1200;
-	int lButtonBottom=1300;
+	int lButtonTop=1400;
+	int lButtonBottom=1500;
 	int rButtonLeft=1000;
 	int rButtonRight=1150;
-	int rButtonTop=1200;
-	int rButtonBottom=1300;
+	int rButtonTop=1400;
+	int rButtonBottom=1500;
 	
 
+	
+	/*
 	private static final int verticesColors[] = {
 	    Color.LTGRAY, Color.LTGRAY, Color.LTGRAY, 0xFF000000, 0xFF000000, 0xFF000000
 	};
-	
+	*/
 	
 	
 	
@@ -59,7 +61,8 @@ public class BoardView  extends SurfaceView implements OnTouchListener {
 	
 	
 	ArrayList<Match> matches;
-	boolean WinArray[];  //  this will list if next move will guarantee a win.  Still figuring this out.
+	String[] winningArray = {"0","0","0","0","0","0","0"};
+	String[] losingArray = {"0","0","0","0","0","0","0"};
 	
 	int currentMatchIndex;
 	
@@ -112,18 +115,47 @@ public class BoardView  extends SurfaceView implements OnTouchListener {
 		drawButton(canvas, 'l', lButtonLeft, lButtonTop, lButtonRight, lButtonBottom);
 		drawButton(canvas, 'r', rButtonLeft, rButtonTop, rButtonRight, rButtonBottom);
 		
+		//  Write which player's turn it is
+		if(matches.get(currentMatchIndex).getPlayerMove().equals("r")) {
+			paint.setColor(Color.RED);
+			canvas.drawText("Red's turn " + (currentMatchIndex + 1), 100, 200, paint);	
+		} else {
+			paint.setColor(Color.BLACK);
+			canvas.drawText("Black's turn " + (currentMatchIndex + 1), 100, 200, paint);
+		}
 		
 		
-		// draw winning array
-		paint.setColor(Color.RED);
-		for(int i =0; i<7; i++) {
-			canvas.drawText("X", 100 + 100*i, 1200, paint);			
-			
+
+		// display the winning and losing arrays
+		paint.setTextSize(40);
+		// draw winning array		
+		
+		if(matches.get(currentMatchIndex).getPlayerMove().equals("r")) {
+			paint.setColor(Color.RED);			
+		} else {
+			paint.setColor(Color.BLACK);			
+		}
+
+				
+		canvas.drawText("Winning Array", xPartition, 1150, paint);		
+		winningArray = matches.get(currentMatchIndex).getWinningArray();
+		for(int i =0; i<7; i++) {	
+			canvas.drawText(winningArray[i], xPartition + xPartition * i, 1200, paint);	
 		}
 
 		
+		// draw losing array
+		if(matches.get(currentMatchIndex).getPlayerMove().equals("r")) {
+			paint.setColor(Color.BLACK);			
+		} else {
+			paint.setColor(Color.RED);			
+		}
 		
-		
+		canvas.drawText("Losing Array", xPartition, 1300, paint);		
+		losingArray = matches.get(currentMatchIndex).getLosingArray();
+		for(int i =0; i<7; i++) {	
+			canvas.drawText(losingArray[i], xPartition + xPartition * i, 1350, paint);	
+		}
 		
 		
 		// draw board
@@ -177,13 +209,6 @@ public class BoardView  extends SurfaceView implements OnTouchListener {
 		canvas.drawLine(100, 150, 150, 100, paintShadow);
 		*/
 
-		//  This is my javascript code
-		//ctx.arc(xpos,ypos,20,0,Math.PI*2,true);
-		//canvas.drawText("" + matches.get(matches.size()-1).getValueAtPosition(0, 0), 200, 200, paint);
-
-		//  This was for testing purposes
-		//paint.setColor(Color.BLACK);
-		//canvas.drawText("X and Y Values " + xValue + " " + yValue, 200, 1200, paint);
 
 	}
 
@@ -280,7 +305,6 @@ public class BoardView  extends SurfaceView implements OnTouchListener {
 	public boolean onTouch(View v, MotionEvent event) {
 
  
-
         switch(event.getAction()){
 			case MotionEvent.ACTION_DOWN:
 				xValue = event.getX();
@@ -307,18 +331,49 @@ public class BoardView  extends SurfaceView implements OnTouchListener {
 				yValue = event.getY();
 
 				//  for some reason it works if you first set it to true and then back to false
-
+				// draw left button
 				if(event.getX()>lButtonLeft && event.getX()<lButtonRight && event.getY()>lButtonTop && event.getY()<lButtonBottom && currentMatchIndex!=0) {
 					currentMatchIndex--;
 					setWillNotDraw(true);				
 					setWillNotDraw(false);				
 				}
-				
+				// draw right button
 				if(event.getX()>rButtonLeft && event.getX()<rButtonRight && event.getY()>rButtonTop && event.getY()<rButtonBottom & currentMatchIndex!=matches.size()-1) {
 					currentMatchIndex++;
 					setWillNotDraw(true);				
 					setWillNotDraw(false);				
 				}
+				
+				// check for click on win array
+				for (int i =0; i<7; i++) {
+					if(event.getX()>xPartition + xPartition * i && event.getX()<xPartition + xPartition * i + 100 && event.getY()>1150 && event.getY()<1250) {						
+						if(winningArray[i]=="0") {
+							winningArray[i]="1";							
+						} else {
+							winningArray[i]="0";
+						}
+				
+						setWillNotDraw(true);				
+						setWillNotDraw(false);					
+					}
+					
+				}
+				
+				// check for click on lose array
+				for (int i =0; i<7; i++) {
+					if(event.getX()>xPartition + xPartition * i && event.getX()<xPartition + xPartition * i + 100 && event.getY()>1300 && event.getY()<1400) {
+						if(losingArray[i]=="0") {
+							losingArray[i]="1";							
+						} else {
+							losingArray[i]="0";
+						}						
+						
+						setWillNotDraw(true);				
+						setWillNotDraw(false);					
+					}
+					
+				}				
+				
 				
 				
 		        //Toast.makeText(this.getContext(), "onTouchEvent", Toast.LENGTH_LONG).show(); 

@@ -12,7 +12,10 @@ public class Match {
 	private int lastTileValue;
 	private int tileStringLength;
 	private boolean winnerFound;
-
+	private String playerMove;
+	private String[] winningArray;
+	private String[] losingArray;	
+	
 	private String name;
 	
 	public Match(){
@@ -23,10 +26,20 @@ public class Match {
 		this.boardArray = new int[numberOfRows][numberOfColumns];
 		
 		
+		winningArray = new String[7];
+		losingArray = new String[7];		
+		
 		for(int i=0; i<numberOfRows; i++) {
 			for(int j=0; j<numberOfColumns; j++) {
 				this.boardArray[i][j]=boardArray[i][j];
 			}			
+		}
+	
+		
+		// set the default for winning and losing arrays
+		for(int i=0; i<7; i++) {
+			winningArray[i]="0";
+			losingArray[i]="0";			
 		}
 		
 	}
@@ -216,4 +229,31 @@ public class Match {
 	public String getName() {
 		return name;
 	}
+
+	public void setPlayerMove(String playerMove) {
+		this.playerMove = playerMove;
+	}
+
+	public String getPlayerMove() {
+		return playerMove;
+	}
+	
+
+	public void updateWinningArray(String[] winningArray) {
+		this.winningArray = winningArray;
+	}
+	
+	public String[] getWinningArray() {
+		return winningArray;
+	}
+	
+	public void updateLosingArray(String[] winningArray) {
+		this.losingArray = winningArray;
+	}
+	
+	public String[] getLosingArray() {
+		return losingArray;
+	}	
+
+	
 }
